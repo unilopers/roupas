@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS tb_product (
     color VARCHAR(255),
     size VARCHAR(255),
     price DOUBLE,
-    active VARCHAR(255)
+    active BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS tb_installment_payment (
