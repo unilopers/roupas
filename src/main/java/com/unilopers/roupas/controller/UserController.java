@@ -26,7 +26,7 @@ public class UserController {
     public ResponseEntity<?> create(@RequestBody User user) {
         try {
             User entity = userRepository.save(user);
-            URI uri = URI.create("/users/" + entity.getUser_id());
+            URI uri = URI.create("/users/" + entity.getUserId());
             return ResponseEntity.created(uri).body(entity);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
