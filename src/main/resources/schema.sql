@@ -1,4 +1,4 @@
-CREATE TABLE tb_user (
+CREATE TABLE IF NOT EXISTS tb_user (
     user_id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255),
@@ -7,7 +7,7 @@ CREATE TABLE tb_user (
     role VARCHAR(255)
 );
 
-CREATE TABLE tb_order (
+CREATE TABLE IF NOT EXISTS tb_order (
     order_id VARCHAR(36) PRIMARY KEY,
     created_at DATE,
     status VARCHAR(255),
@@ -18,7 +18,7 @@ CREATE TABLE tb_order (
     CONSTRAINT fk_order_user FOREIGN KEY (user_id) REFERENCES tb_user(user_id)
 );
 
-CREATE TABLE tb_product (
+CREATE TABLE IF NOT EXISTS tb_product (
     product_id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(255),
     category VARCHAR(255),
@@ -28,7 +28,7 @@ CREATE TABLE tb_product (
     active VARCHAR(255)
 );
 
-CREATE TABLE tb_installment_payment (
+CREATE TABLE IF NOT EXISTS tb_installment_payment (
     installment_payment_id VARCHAR(36) PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     order_id VARCHAR(36),
@@ -41,7 +41,7 @@ CREATE TABLE tb_installment_payment (
     CONSTRAINT fk_installment_order FOREIGN KEY (order_id) REFERENCES tb_order(order_id)
 );
 
-CREATE TABLE tb_order_item (
+CREATE TABLE IF NOT EXISTS tb_order_item (
     order_item_id VARCHAR(36) PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     order_id VARCHAR(36) NOT NULL,
