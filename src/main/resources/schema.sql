@@ -52,3 +52,14 @@ CREATE TABLE IF NOT EXISTS tb_order_item (
     CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES tb_order(order_id),
     CONSTRAINT fk_order_item_product FOREIGN KEY (product_id) REFERENCES tb_product(product_id)
 );
+
+CREATE TABLE IF NOT EXISTS tb_inventory_movement (
+    inventory_movement_id VARCHAR(36) PRIMARY KEY,
+    product_id VARCHAR(36) NOT NULL,
+    type VARCHAR(10) NOT NULL,
+    quantity INT NOT NULL,
+    date DATE NOT NULL,
+    reason VARCHAR(255),
+    CONSTRAINT fk_inventory_movement_product FOREIGN KEY (product_id) REFERENCES tb_product(product_id),
+    CONSTRAINT chk_movement_type CHECK (type IN ('IN', 'OUT'))
+);
