@@ -1,5 +1,7 @@
 package com.unilopers.roupas.domain;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,11 +17,13 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "tb_order")
+@JacksonXmlRootElement(localName = "order")
 public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "order_id")
+    @JacksonXmlProperty(localName = "orderId")
     private UUID orderId;
 
     @Column(name = "created_at")

@@ -4,6 +4,7 @@ import com.unilopers.roupas.domain.Orders;
 import com.unilopers.roupas.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class OrderController {
         this.orderRepository = orderRepository;
     }
 
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_XML_VALUE })
     public ResponseEntity<?> create(@RequestBody Orders order) {
         try {
             Orders entity = orderRepository.save(order);
