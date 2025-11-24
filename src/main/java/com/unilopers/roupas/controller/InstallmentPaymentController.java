@@ -1,9 +1,9 @@
 package com.unilopers.roupas.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,37 +15,38 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.unilopers.roupas.domain.InstallmentPayment;
+import com.unilopers.roupas.domain.InstallmentPaymentListWrapper;
 import com.unilopers.roupas.repository.InstallmentPaymentRepository;
 
 @RestController
-@RequestMapping("/installment-payments")
+@RequestMapping(value = "/installment-payments", produces = MediaType.APPLICATION_XML_VALUE)
 public class InstallmentPaymentController {
 
     @Autowired
     private InstallmentPaymentRepository repository;
 
-    @GetMapping
-    public List<InstallmentPayment> getAll() {
-        return repository.findAll();
+    @GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
+    public InstallmentPaymentListWrapper getAll() {
+        return new InstallmentPaymentListWrapper(repository.findAll());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<InstallmentPayment> getById(@PathVariable Long id) {
         Optional<InstallmentPayment> payment = repository.findById(id);
         return payment.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_XML_VALUE)
     public InstallmentPayment create(@RequestBody InstallmentPayment payment) {
         return repository.save(payment);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<InstallmentPayment> update(@PathVariable Long id, @RequestBody InstallmentPayment payment) {
         if (!repository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        payment.setId(id);
+        payment.setId(id.toString());
         return ResponseEntity.ok(repository.save(payment));
     }
 
