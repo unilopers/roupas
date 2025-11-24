@@ -1,5 +1,6 @@
 package com.unilopers.roupas.domain;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,14 +15,17 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "tb_user")
+@JacksonXmlRootElement(localName = "User")
 public class User {
+
+    // ==============================
+    // FIELDS
+    // ==============================
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "user_id")
     private UUID userId;
 
-    @Column(nullable = false)
     private String name;
 
     private String email;

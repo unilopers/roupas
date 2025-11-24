@@ -4,6 +4,7 @@ import com.unilopers.roupas.domain.User;
 import com.unilopers.roupas.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,14 +16,30 @@ import java.util.UUID;
 @RequestMapping("/api/user")
 public class UserController {
 
+    // ==============================
+    // FIELDS
+    // ==============================
+
     private final UserRepository userRepository;
+
+    // ==============================
+    // CONSTRUCTORS
+    // ==============================
 
     @Autowired
     public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/create")
+    // ==============================
+    // METHODS
+    // ==============================
+
+    @PostMapping(
+            value = "/create",
+            consumes = MediaType.APPLICATION_XML_VALUE,
+            produces = MediaType.APPLICATION_XML_VALUE
+    )
     public ResponseEntity<?> create(@RequestBody User user) {
         try {
             User entity = userRepository.save(user);
@@ -33,7 +50,12 @@ public class UserController {
         }
     }
 
-    @GetMapping("/all")
+    // ==============================
+
+    @GetMapping(
+            value = "/all",
+            produces = MediaType.APPLICATION_XML_VALUE
+    )
     public ResponseEntity<?> read() {
         try {
             List<User> entities = userRepository.findAll().stream().toList();
@@ -43,7 +65,28 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    // ==============================
+
+    @GetMapping(
+            value = "/{id}",
+            produces = MediaType.APPLICATION_XML_VALUE
+    )
+    public ResponseEntity<?> readById(@PathVariable UUID id) {
+        try {
+            User entity = userRepository.getReferenceById(id);
+            return ResponseEntity.ok().body(entity);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // ==============================
+
+    @PutMapping(
+            value = "/update/{id}",
+            consumes = MediaType.APPLICATION_XML_VALUE,
+            produces = MediaType.APPLICATION_XML_VALUE
+    )
     public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody User user) {
         try {
             User entity = userRepository.getReferenceById(id);
@@ -58,7 +101,11 @@ public class UserController {
         }
     }
 
-    @DeleteMapping( "/delete/{id}")
+    // ==============================
+
+    @DeleteMapping(
+            value = "/delete/{id}"
+    )
     public ResponseEntity<?> delete(@PathVariable UUID id) {
         try {
             userRepository.deleteById(id);
