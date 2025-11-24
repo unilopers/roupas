@@ -22,17 +22,17 @@ public class OrderItemController {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_XML_VALUE)
     public List<OrderItem> findAll() {
         return orderItemRepository.findAll();
     }
 
-    @GetMapping("/by-order")
+    @GetMapping(value = "/by-order", produces = MediaType.APPLICATION_XML_VALUE)
     public List<OrderItem> findByOrder(@RequestParam UUID orderId) {
         return orderItemRepository.findByOrder_OrderId(orderId);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_XML_VALUE)
     public OrderItem findOne(@PathVariable UUID id) {
         return orderItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Item de pedido não encontrado"));

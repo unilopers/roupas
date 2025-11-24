@@ -23,7 +23,7 @@ public class InventoryMovementController {
         this.inventoryMovementRepository = inventoryMovementRepository;
     }
 
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> getAllInventoryMovements() {
         try {
             List<InventoryMovement> entities = inventoryMovementRepository.findAll();
@@ -33,7 +33,7 @@ public class InventoryMovementController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> getInventoryMovementById(@PathVariable UUID id) {
         try {
             InventoryMovement entity = inventoryMovementRepository.findById(id)
@@ -44,7 +44,7 @@ public class InventoryMovementController {
         }
     }
 
-    @GetMapping("/product/{productId}")
+    @GetMapping(value = "/product/{productId}", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> getInventoryMovementsByProductId(@PathVariable UUID productId) {
         try {
             List<InventoryMovement> entities = inventoryMovementRepository.findByProductId(productId);
@@ -54,7 +54,7 @@ public class InventoryMovementController {
         }
     }
 
-    @GetMapping("/type/{type}")
+    @GetMapping(value = "/type/{type}", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> getInventoryMovementsByType(@PathVariable InventoryMovement.MovementType type) {
         try {
             List<InventoryMovement> entities = inventoryMovementRepository.findByType(type);
@@ -64,7 +64,7 @@ public class InventoryMovementController {
         }
     }
 
-    @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = "/create", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> createInventoryMovement(@RequestBody InventoryMovement inventoryMovement) {
         try {
             InventoryMovement entity = inventoryMovementRepository.save(inventoryMovement);
@@ -75,7 +75,7 @@ public class InventoryMovementController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping(value = "/update/{id}", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> updateInventoryMovement(@PathVariable UUID id, @RequestBody InventoryMovement inventoryMovement) {
         try {
             InventoryMovement entity = inventoryMovementRepository.findById(id)

@@ -4,6 +4,7 @@ import com.unilopers.roupas.domain.Product;
 import com.unilopers.roupas.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class ProductController {
         this.productRepository = productRepository;
     }
 
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> create(@RequestBody Product product) {
         try {
             Product entity = productRepository.save(product);
@@ -33,7 +34,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> read() {
         try {
             List<Product> entities = productRepository.findAll();
@@ -43,7 +44,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> readById(@PathVariable UUID id) {
         try {
             Product entity = productRepository.findById(id).orElse(null);
@@ -56,7 +57,7 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping(value = "/update/{id}", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody Product product) {
         try {
             Product entity = productRepository.findById(id).orElse(null);

@@ -23,7 +23,7 @@ public class OrderController {
         this.orderRepository = orderRepository;
     }
 
-    @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_XML_VALUE })
+    @PostMapping(value = "/create", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> create(@RequestBody Orders order) {
         try {
             Orders entity = orderRepository.save(order);
@@ -34,7 +34,7 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> read() {
         try {
             List<Orders> entities = orderRepository.findAll();
@@ -44,7 +44,7 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> getById(@PathVariable UUID id) {
         try {
             Orders entity = orderRepository.findById(id)
@@ -55,7 +55,7 @@ public class OrderController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping(value = "/update/{id}", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody Orders order) {
         try {
             Orders entity = orderRepository.findById(id)
