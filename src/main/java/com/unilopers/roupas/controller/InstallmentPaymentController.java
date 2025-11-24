@@ -1,5 +1,6 @@
 package com.unilopers.roupas.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.unilopers.roupas.domain.InstallmentPayment;
-import com.unilopers.roupas.domain.InstallmentPaymentListWrapper;
 import com.unilopers.roupas.repository.InstallmentPaymentRepository;
 
 @RestController
@@ -26,8 +26,8 @@ public class InstallmentPaymentController {
     private InstallmentPaymentRepository repository;
 
     @GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
-    public InstallmentPaymentListWrapper getAll() {
-        return new InstallmentPaymentListWrapper(repository.findAll());
+    public List<InstallmentPayment> getAll() {
+        return repository.findAll();
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_XML_VALUE)
