@@ -6,3 +6,4 @@ O Louis Vittao é um sistema de gestão para uma loja de roupas, desenvolvido co
 - Felipe Caldeira Akryghti
 - Fernando Barros Greca
 - Samir Kaled Ali Chehade
+- Igor Domingues Pereira
