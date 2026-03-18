@@ -1,0 +1,6 @@
+Method,Name,Error,Occurrences
+PUT,PUT /api/product/update/{id},CatchResponseError('Status 404'),57
+PUT,PUT /api/product/update/{id},CatchResponseError('Status 500'),1
+GET,GET /api/product/{id},HTTPError('404 Client Error:  for url: GET /api/product/{id}'),99
+DELETE,DELETE /api/product/delete/{id},CatchResponseError('Status 500'),3
+DELETE,DELETE /api/product/delete/{id},CatchResponseError('Status 404'),54

@@ -42,15 +42,28 @@ def _build_user_xml():
     <password>{password}</password>
 </User>"""
 
+def _build_product_xml():
+    name = f"Produto_{_random_string(6)}"
+    category = random.choice(["Camiseta", "Calca", "Vestido", "Tenis", "Acessorio"])
+    color = random.choice(["Preto", "Branco", "Azul", "Vermelho", "Verde"])
+    size = random.choice(["PP", "P", "M", "G", "GG"])
+    price = round(random.uniform(19.9, 399.9), 2)
+    active = random.choice([True, False])
+    return f"""<product>
+    <name>{name}</name>
+    <category>{category}</category>
+    <color>{color}</color>
+    <size>{size}</size>
+    <price>{price}</price>
+    <active>{str(active).lower()}</active>
+</product>"""
 
-# ──────────────────────────────────────────────
-#  Locust User
-# ──────────────────────────────────────────────
-class UserLoadTest(HttpUser):
+
+
+class AuthenticatedUser(HttpUser):
     wait_time = between(1, 3)
     host = "http://localhost:8080"
     token = None
-    created_user_ids = []
 
     def on_start(self):
         """Obtém token JWT via /auth/login antes de iniciar os testes."""
@@ -70,6 +83,13 @@ class UserLoadTest(HttpUser):
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
         return headers
+
+
+# ──────────────────────────────────────────────
+#  Locust Users
+# ──────────────────────────────────────────────
+class UserLoadTest(AuthenticatedUser):
+    created_user_ids = []
 
     # ── POST /api/user/create ──
     @task(1)
@@ -112,3 +132,91 @@ class UserLoadTest(HttpUser):
             headers=self._auth_headers(),
             name="GET /api/user/{id}",
         )
+
+# ──────────────────────────────────────────────
+#  Locust Products
+# ──────────────────────────────────────────────
+class ProductLoadTest(AuthenticatedUser):
+    created_product_ids = []
+
+    # ── POST /api/product/create ──
+    @task(1)
+    def create_product(self):
+        xml_body = _build_product_xml()
+        with self.client.post(
+            "/api/product/create",
+            data=xml_body,
+            headers=self._auth_headers(),
+            name="POST /api/product/create",
+            catch_response=True,
+        ) as response:
+            if response.status_code == 201:
+                import xml.etree.ElementTree as ET
+                root = ET.fromstring(response.text)
+                product_id = root.findtext("productId") or root.findtext(".//productId")
+                if product_id:
+                    self.created_product_ids.append(product_id)
+                response.success()
+            else:
+                response.failure(f"Status {response.status_code}")
+
+    # ── GET /api/product/all ──
+    @task(3)
+    def get_all_products(self):
+        self.client.get(
+            "/api/product/all",
+            headers=self._auth_headers(),
+            name="GET /api/product/all",
+        )
+
+    # ── GET /api/product/{id} ──
+    @task(2)
+    def get_product_by_id(self):
+        if not self.created_product_ids:
+            return
+        product_id = random.choice(self.created_product_ids)
+        self.client.get(
+            f"/api/product/{product_id}",
+            headers=self._auth_headers(),
+            name="GET /api/product/{id}",
+        )
+
+    # ── PUT /api/product/update/{id} ──
+    @task(1)
+    def update_product(self):
+        if not self.created_product_ids:
+            return
+        product_id = random.choice(self.created_product_ids)
+        xml_body = _build_product_xml()
+        with self.client.put(
+            f"/api/product/update/{product_id}",
+            data=xml_body,
+            headers=self._auth_headers(),
+            name="PUT /api/product/update/{id}",
+            catch_response=True,
+        ) as response:
+            if response.status_code == 200:
+                response.success()
+            else:
+                response.failure(f"Status {response.status_code}")
+
+    # ── DELETE /api/product/delete/{id} ──
+    @task(1)
+    def delete_product(self):
+        if not self.created_product_ids:
+            return
+        product_id = random.choice(self.created_product_ids)
+        with self.client.delete(
+            f"/api/product/delete/{product_id}",
+            headers=self._auth_headers(),
+            name="DELETE /api/product/delete/{id}",
+            catch_response=True,
+        ) as response:
+            if response.status_code == 204:
+                try:
+                    self.created_product_ids.remove(product_id)
+                except ValueError:
+                    pass
+                response.success()
+            else:
+                response.failure(f"Status {response.status_code}")
