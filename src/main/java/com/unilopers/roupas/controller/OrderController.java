@@ -1,5 +1,6 @@
 package com.unilopers.roupas.controller;
 
+import com.unilopers.roupas.async.OrderAsyncService;
 import com.unilopers.roupas.domain.Orders;
 import com.unilopers.roupas.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,16 +19,25 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderRepository orderRepository;
+    private final OrderAsyncService orderAsyncService;
 
     @Autowired
-    public OrderController(OrderRepository orderRepository) {
+    public OrderController(OrderRepository orderRepository, OrderAsyncService orderAsyncService) {
         this.orderRepository = orderRepository;
+        this.orderAsyncService = orderAsyncService;
     }
 
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> create(@RequestBody Orders order) {
         try {
+            if (order.getCreatedAt() == null) {
+                order.setCreatedAt(LocalDate.now());
+            }
+            order.setStatus("PENDING");
+
             Orders entity = orderRepository.save(order);
+            orderAsyncService.processOrderAsync(entity.getOrderId());
+
             URI uri = URI.create("/api/order/" + entity.getOrderId());
             return ResponseEntity.created(uri).body(entity);
         } catch (Exception e) {
