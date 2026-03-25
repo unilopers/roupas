@@ -1,5 +1,6 @@
 package com.unilopers.roupas.controller;
 
+import com.unilopers.roupas.async.OrderItemAsyncService;
 import com.unilopers.roupas.domain.OrderItem;
 import com.unilopers.roupas.domain.Orders;
 import com.unilopers.roupas.domain.Product;
@@ -7,7 +8,9 @@ import com.unilopers.roupas.repository.OrderItemRepository;
 import com.unilopers.roupas.repository.OrderRepository;
 import com.unilopers.roupas.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +24,7 @@ public class OrderItemController {
     private final OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final OrderItemAsyncService orderItemAsyncService;
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_XML_VALUE)
     public List<OrderItem> findAll() {
@@ -43,6 +47,7 @@ public class OrderItemController {
             consumes = MediaType.APPLICATION_XML_VALUE,
             produces = MediaType.APPLICATION_XML_VALUE
     )
+    @ResponseStatus(HttpStatus.CREATED)
     public OrderItem create(@RequestBody OrderItem body) {
 
         if (body.getOrder() == null || body.getOrder().getOrderId() == null) {
@@ -52,13 +57,11 @@ public class OrderItemController {
             throw new RuntimeException("product.productId é obrigatório");
         }
 
-
         Orders order = orderRepository.findById(body.getOrder().getOrderId())
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
         Product product = productRepository.findById(body.getProduct().getProductId())
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-
 
         OrderItem item = new OrderItem();
         item.setOrder(order);
@@ -66,10 +69,13 @@ public class OrderItemController {
         item.setQuantity(body.getQuantity());
         item.setUnitPrice(body.getUnitPrice());
 
-        Double subtotal = body.getQuantity() * body.getUnitPrice();
-        item.setSubtotal(subtotal);
+        // Persistência imediata sem subtotal — resposta rápida ao cliente
+        OrderItem saved = orderItemRepository.save(item);
 
-        return orderItemRepository.save(item);
+        // Cálculo do subtotal delegado ao processamento assíncrono
+        orderItemAsyncService.calculateSubtotalAsync(saved.getOrderItemId());
+
+        return saved;
     }
 
     @PutMapping(
@@ -83,9 +89,14 @@ public class OrderItemController {
 
         entity.setQuantity(body.getQuantity());
         entity.setUnitPrice(body.getUnitPrice());
-        entity.setSubtotal(body.getQuantity() * body.getUnitPrice());
 
-        return orderItemRepository.save(entity);
+        // Persiste imediatamente sem subtotal
+        OrderItem saved = orderItemRepository.save(entity);
+
+        // Recalcula subtotal de forma assíncrona
+        orderItemAsyncService.calculateSubtotalAsync(saved.getOrderItemId());
+
+        return saved;
     }
 
     @DeleteMapping("/delete/{id}")
