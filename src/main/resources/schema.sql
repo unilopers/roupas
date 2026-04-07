@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS tb_installment_payment (
     paid BOOLEAN,
     payment_date DATE,
     method VARCHAR(255),
-    CONSTRAINT fk_installment_order FOREIGN KEY (order_id) REFERENCES tb_order(order_id)
+    CONSTRAINT fk_installment_order FOREIGN KEY (order_id) REFERENCES tb_order(order_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tb_order_item (
@@ -50,9 +50,17 @@ CREATE TABLE IF NOT EXISTS tb_order_item (
     quantity BIGINT,
     unity_price DOUBLE,
     subtotal DOUBLE,
-    CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES tb_order(order_id),
+    CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES tb_order(order_id) ON DELETE CASCADE,
     CONSTRAINT fk_order_item_product FOREIGN KEY (product_id) REFERENCES tb_product(product_id)
 );
+
+ALTER TABLE tb_order_item DROP CONSTRAINT IF EXISTS fk_order_item_order;
+ALTER TABLE tb_order_item
+    ADD CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES tb_order(order_id) ON DELETE CASCADE;
+
+ALTER TABLE tb_installment_payment DROP CONSTRAINT IF EXISTS fk_installment_order;
+ALTER TABLE tb_installment_payment
+    ADD CONSTRAINT fk_installment_order FOREIGN KEY (order_id) REFERENCES tb_order(order_id) ON DELETE CASCADE;
 
 CREATE TABLE IF NOT EXISTS tb_inventory_movement (
     inventory_movement_id VARCHAR(36) PRIMARY KEY,
